@@ -39,3 +39,9 @@ K4-DAY13-VuiVe/*
 !data/ATTRIBUTION.md
 !data/LICENSE.txt
 student-bundles/
+
+# Publish only the requested report documents in the submission structure.
+!report/K4-DAY13-VuiVe/
+report/K4-DAY13-VuiVe/*
+!report/K4-DAY13-VuiVe/TEAMMATES.md
+!report/K4-DAY13-VuiVe/PRE-LABEL-REPORT.md

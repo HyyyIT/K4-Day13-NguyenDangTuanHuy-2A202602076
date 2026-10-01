@@ -1,3 +1,26 @@
+# K4 Day 13 — Nguyễn Đăng Tuấn Huy
+
+- **Họ và tên:** Nguyễn Đăng Tuấn Huy
+- **MSSV:** 2A202602076
+- **Nhóm:** K4-DAY13-VuiVe
+
+## Báo cáo nhóm
+
+- [Thành viên và phân vai A/B/C](report/K4-DAY13-VuiVe/TEAMMATES.md)
+- [Báo cáo PointPillars và nhận xét từng thành viên](report/K4-DAY13-VuiVe/PRE-LABEL-REPORT.md)
+
+```text
+README.md
+report/
+└── K4-DAY13-VuiVe/
+    ├── TEAMMATES.md
+    └── PRE-LABEL-REPORT.md
+```
+
+Các báo cáo trong `report/` được sao chép từ thư mục `K4-DAY13-VuiVe/` hiện có. Các file gốc, tài liệu hướng dẫn và kết quả thực hành vẫn được giữ nguyên tại vị trí ban đầu. Những đường dẫn `output/...` trong báo cáo ghi lại vị trí khi chạy; kết quả lưu trong repo nằm ở [ket-qua-nhom-01/](ket-qua-nhom-01/).
+
+## Tài liệu hướng dẫn ban đầu
+
 # Ngày 13 — Robotaxi A: LiDAR 3D Object
 
 Hôm nay bạn kiểm tra **pre-label từ PointPillars pretrained**, sửa cuboid 3D bằng bằng chứng và review bài của người khác. Bạn cần nhận ra khi nào lỗi nằm ở cả pipeline, khi nào chỉ một hộp cần chỉnh. Hộp model vẽ sẵn là gợi ý để bắt đầu, không phải đáp án.
