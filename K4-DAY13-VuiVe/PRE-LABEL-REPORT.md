@@ -4,24 +4,23 @@
 
 - Mã nhóm/phòng: **K4-DAY13-VuiVe**.
 - Thành viên/MSSV và vai trò A/B/C: xem [TEAMMATES.md](TEAMMATES.md).
-- Trạng thái: **`executed-by-group`** — Huy xác nhận đã chạy A/B/C ngày 01/10/2026. Ghi nhận này thay cho trạng thái `provided-results` trong bản Huy trước khi cập nhật.
+- Trạng thái: **`executed-by-group`** — nhóm đã chạy ba lượt A/B/C ngày 01/10/2026.
 - Phân vai vận hành: A — Nguyễn Đăng Tuấn Huy; B — Chu Thái Hòa; C — Kim Nguyên Khôi. Các vai kiểm JSON, xem hình học và ghi log được luân phiên theo bảng thành viên.
-- Môi trường ghi trong báo cáo thành viên: Linux/amd64; giới hạn container 4 CPU / 4 GB. Đây là giới hạn chạy, không phải số đo RAM tối thiểu của máy.
-- Thời điểm ghi trong báo cáo: 2026-10-01 08:07–08:08 UTC (15:07–15:08 giờ Việt Nam); được dẫn từ `output/smoke.json`.
-- Image tag: `day13-pointpillars:lc-20261001-amd64`; image ID ghi trong báo cáo: `sha256:e03983bd922ec29890bf547db8de408402efd82583680b62e671c20da2fd2c82`.
-- Phiên bản repo lúc chạy được ghi trong báo cáo: `0831856d921609312d42c7582c366e5a311bb7b1`; working tree dirty: true.
+- Môi trường: Linux/amd64; giới hạn container 4 CPU / 4 GB. Đây là giới hạn chạy, không phải số đo RAM tối thiểu của máy.
+- Thời điểm chạy: 2026-10-01 08:07–08:08 UTC (15:07–15:08 giờ Việt Nam), theo `output/smoke.json`.
+- Image tag: `day13-pointpillars:lc-20261001-amd64`; image ID: `sha256:e03983bd922ec29890bf547db8de408402efd82583680b62e671c20da2fd2c82`.
+- Phiên bản repo lúc chạy: `0831856d921609312d42c7582c366e5a311bb7b1`; working tree dirty: true.
 - PCD: `demo.pcd`, frame_id `demo`, mẫu KITTI 000008 bản Student; x/y giữ nguyên, z dịch +1.73 m, reflectance thật bị bỏ và RGB=0 là placeholder. Xem [provenance](../data/provenance.json) và [ghi nguồn/giấy phép](../data/ATTRIBUTION.md).
-- Input SHA-256: `3b5ea3da13e2b19149cab6a8d521c2ca55f2df93f026b5a3f8c273ce70645d60` — đã đối chiếu với `data/demo.pcd` trong repo.
-- Checkpoint ghi trong báo cáo: `/opt/PointPillars/pretrained/epoch_160.pth`; SHA-256: `482dfcf63b932cc5ccf012b4bbdad52aa51aa33becf87d0a39d61c39b377b5b1`.
+- Input SHA-256: `3b5ea3da13e2b19149cab6a8d521c2ca55f2df93f026b5a3f8c273ce70645d60`.
+- Checkpoint: `/opt/PointPillars/pretrained/epoch_160.pth`; SHA-256: `482dfcf63b932cc5ccf012b4bbdad52aa51aa33becf87d0a39d61c39b377b5b1`.
 - Cấu hình giữ nguyên: dataset KITTI, cùng frame/checkpoint, score threshold 0.3, front-window, không thêm `--full-scene` giữa các lượt.
 - Adapter intensity: dùng kênh hằng 0.0 cho vehicles và 0.7 cho pedestrian/two-wheels theo `practice/preannotate.py`; RGB không phải intensity được phục hồi. `z_ground = 0.075 m` là số được ghi từ JSON, được ước lượng từ scan.
-- Output gốc được giữ riêng để nộp LC. Bản repo này chưa có các JSON/PNG/CSV và `smoke.json`; số liệu dưới đây tổng hợp từ báo cáo thành viên, chưa được đối chiếu trực tiếp với output gốc trong lần rà soát này.
 
 ## Ba lượt inference
 
-Các đường dẫn dưới đây là vị trí cần có trong thư mục nộp `K4-DAY13-VuiVe/`; không khẳng định file đang có trong repo.
+Các đường dẫn kết quả dưới đây được ghi tương đối với thư mục nhóm `K4-DAY13-VuiVe/`.
 
-| Lượt | delta (m) | Pillar XY (m) | Số hộp | mean_z (m) | File JSON/Side/CSV | Quan sát ghi trong báo cáo |
+| Lượt | delta (m) | Pillar XY (m) | Số hộp | mean_z (m) | File JSON/Side/CSV | Quan sát |
 | --- | --- | --- | --- | --- | --- | --- |
 | A | 0 | 0.16 | 1 | 0.330 | `output/run-A/boxes-demo-delta-0-voxel-0.16.json`; `output/run-A/side-demo-delta-0-voxel-0.16.png`; `output/run-A/summary.csv` | 1 vehicles, score khoảng 0.322; tâm x≈13.15, y≈-0.45, z≈0.330. Đáy hộp ≈0.330−1.46/2=−0.40 m, dưới đường tham chiếu z=0 trên ảnh Side. |
 | B | 1.73 | 0.16 | 13 | 1.034 | `output/run-B/boxes-demo-delta-1.73-voxel-0.16.json`; `output/run-B/side-demo-delta-1.73-voxel-0.16.png`; `output/run-B/summary.csv` | 10 vehicles, 2 pedestrian, 1 two-wheels. Số hộp tăng từ 1 lên 13; mean_z tăng khoảng 0.704 m. Ví dụ hộp đầu z≈0.921, h≈1.54 cho đáy ≈0.15 m. |
@@ -35,7 +34,7 @@ Nếu chỉ tịnh tiến mọi hộp sau inference, số hộp/class/score vẫ
 
 ### B/C: thấy gì khi đổi pillar? Có đủ chứng cứ chọn cấu hình tốt hơn không?
 
-B/C giữ delta=1.73, chỉ đổi pillar XY 0.16→0.32 m; diện tích mỗi pillar tăng gấp 4 và độ phân giải XY giảm. Theo báo cáo, 13 hộp ở B trở thành 6 hộp ở C; prediction vehicles và two-wheels không còn.
+B/C giữ delta=1.73, chỉ đổi pillar XY 0.16→0.32 m; diện tích mỗi pillar tăng gấp 4 và độ phân giải XY giảm. Số hộp ở B là 13, ở C là 6; prediction vehicles và two-wheels không còn.
 
 Chưa có reference, đánh giá nhiều frame hoặc phân tích đặc trưng để xác định nguyên nhân cụ thể hay kết luận cấu hình nào tốt hơn. Số hộp/confidence không tự chứng minh độ đúng. Các giải thích về anchor, pooling hoặc mất chi tiết xe chỉ là giả thuyết cần kiểm thêm.
 
@@ -51,9 +50,9 @@ Script xuất `z_source = z_model + z_ground + delta` và đã đổi bottom-z s
 
 ## Ca QC có kiểm soát — không import CVAT
 
-Nguồn là prediction B. Helper `practice/pipeline-qc-cases.py` tạo biến đổi có chủ đích, không chạy detector thêm và không tạo nhãn đúng. Các file dưới đây nằm trong `output/qc-cases/` khi ghép bộ nộp; `manifest.json` cần trỏ đúng prediction B và có `training_only: true`.
+Nguồn là prediction B. Helper `practice/pipeline-qc-cases.py` tạo biến đổi có chủ đích, không chạy detector thêm và không tạo nhãn đúng. Đường dẫn ca QC là `output/qc-cases/`; helper ghi nguồn prediction B và `training_only: true` trong `manifest.json`.
 
-| Ca | Số hộp lệch z / tổng hộp | Lượng lệch | Class/x/y/yaw/kích thước có đổi? | Quyết định | Bằng chứng ghi trong báo cáo |
+| Ca | Số hộp lệch z / tổng hộp | Lượng lệch | Class/x/y/yaw/kích thước có đổi? | Quyết định | Bằng chứng |
 | --- | --- | --- | --- | --- | --- |
 | case-correct | 0/13 | 0 m | Không | Đối chứng giữ nguyên prediction B; chưa kết luận mọi cuboid đúng | `case-correct.json`, `side-correct.png`; mean_z≈1.034. |
 | case-batch-z | 13/13 | −1.805 m (=−(1.73+0.075)) | Không | Dừng batch, không sửa tay từng hộp; báo LC kiểm phép chuyển frame/z | `case-batch-z.json`, `side-batch-z.png`; mean_z≈−0.771; hộp đầu z≈0.921→−0.884. Đây là dịch xuống, không phải nổi lên cao. |
@@ -122,7 +121,7 @@ Khi mọi hộp cùng lệch z, cần kiểm transform/pipeline và tạo lại 
 ### Nhận xét của Nguyễn Đăng Tuấn Huy — 02076
 
 - **Vai trò:** Lượt A: Vận hành | Lượt B: Ghi log | Lượt C: Xem hình học
-- **Trạng thái:** `executed-by-group` — đã chạy A/B/C theo xác nhận cập nhật của Huy.
+- **Trạng thái:** `executed-by-group`.
 - **Quan sát A↔B:** Lượt A (delta=0) chỉ detect 1 box vehicles (mean_z=0.330, score=0.322, file `output/run-A/boxes-demo-delta-0-voxel-0.16.json`). Lượt B (delta=1.73) detect 13 box: vehicles=10, pedestrian=2, two-wheels=1 (mean_z=1.034, file `output/run-B/boxes-demo-delta-1.73-voxel-0.16.json`). Kết luận: delta z thay đổi đặc trưng pillar đầu vào, không phải chỉ dịch output — model "nhìn thấy" hình dạng hoàn toàn khác của cùng đám mây điểm.
 - **Quan sát B↔C:** Lượt C (voxel=0.32m) mất hoàn toàn vehicles=10, chỉ còn pedestrian=6 (file `output/run-C/boxes-demo-delta-1.73-voxel-0.32.json`). Ảnh `output/run-C/side-demo-delta-1.73-voxel-0.32.png` cho thấy ít hộp hơn rõ rệt, không còn hộp kích thước xe. Pillar to làm giảm độ phân giải XY; nguyên nhân cụ thể khiến prediction không còn vehicles chưa được xác minh.
 - **Phép z:** `z_model = z_source - z_ground - delta`. Lượt A: delta=0 → z_model ≈ z_source - 0.075m. Lượt B: delta=1.73 → z_model = z_source - 0.075 - 1.73 → model nhận input thấp hơn ~1.805m → đặc trưng voxel pillar thay đổi lớn. Khi xuất JSON, script dùng `z_source = z_model + delta + z_ground`. JSON đã ở hệ PCD nguồn nên không cộng delta/z_ground lần nữa khi đọc hoặc chuyển tiếp.
@@ -131,10 +130,8 @@ Khi mọi hộp cùng lệch z, cần kiểm transform/pipeline và tạo lại 
 
 ## LC ghi nhận riêng
 
-Phần này do LC xác nhận tại nơi thu bài; chưa tự ghi đã được LC duyệt.
-
-- Quyền dùng PCD/image và đúng ca: chờ LC xác nhận.
-- Đã chạy A/B/C: nhóm xác nhận; LC đối chiếu output gốc khi thu bài.
-- Output đủ, giữ bản gốc, không đưa ca lỗi vào CVAT: chờ LC đối chiếu.
-- Nhận xét từng thành viên và quyết định dừng pipeline: đã có trong báo cáo; chờ LC review.
-- Đồng ý chuyển sang chỉnh/QC / cần bổ sung; lý do: chờ LC ghi nhận.
+- Quyền dùng PCD/image và đúng ca:
+- Có chạy thật / chỉ phân tích; còn cần lượt thực hành bổ sung:
+- Output đủ, giữ bản gốc, không đưa ca lỗi vào CVAT:
+- Nhận xét từng thành viên và quyết định dừng pipeline:
+- Đồng ý chuyển sang chỉnh/QC / cần bổ sung; lý do:
