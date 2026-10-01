@@ -3,9 +3,9 @@
 ## Nhóm và provenance
 
 - Mã nhóm/phòng: **K4-DAY13-VuiVe**.
-- Mã thành viên TV1–TV4, họ tên/MSSV và vai trò A/B/C: xem [TEAMMATES.md](TEAMMATES.md).
+- Thành viên/MSSV và vai trò A/B/C: xem [TEAMMATES.md](TEAMMATES.md).
 - Trạng thái: **`executed-by-group`** — nhóm đã chạy ba lượt A/B/C ngày 01/10/2026.
-- Phân vai vận hành: A — TV1; B — TV2; C — TV3. Các vai kiểm JSON, xem hình học và ghi log được luân phiên theo bảng thành viên.
+- Phân vai vận hành: A — Nguyễn Đăng Tuấn Huy; B — Chu Thái Hòa; C — Kim Nguyên Khôi. Các vai kiểm JSON, xem hình học và ghi log được luân phiên theo bảng thành viên.
 - Môi trường: Linux/amd64; giới hạn container 4 CPU / 4 GB. Đây là giới hạn chạy, không phải số đo RAM tối thiểu của máy.
 - Thời điểm chạy: 2026-10-01 08:07–08:08 UTC (15:07–15:08 giờ Việt Nam), theo `output/smoke.json`.
 - Image tag: `day13-pointpillars:lc-20261001-amd64`; image ID: `sha256:e03983bd922ec29890bf547db8de408402efd82583680b62e671c20da2fd2c82`.
@@ -62,7 +62,7 @@ Khi mọi hộp cùng lệch z, cần kiểm transform/pipeline và tạo lại 
 
 ## Nhận xét cá nhân
 
-### Nhận xét của TV3
+### Nhận xét của Kim Nguyên Khôi — MSSV: 02116
 
 - **Vai trò:** Lượt A: xem hình học | Lượt B: kiểm JSON/cấu hình | Lượt C: vận hành
 - **Quan sát A↔B:**
@@ -81,7 +81,7 @@ Khi mọi hộp cùng lệch z, cần kiểm transform/pipeline và tạo lại 
   - Chưa rõ tại sao khi tăng kích thước pillar lên 0.32m thì mạng lại mất toàn bộ class `vehicles` nhưng lại nhận diện được 6 `pedestrian` (có thể do pooling của voxel thô làm suy yếu đặc trưng của xe lớn hoặc do anchor tuning).
   - Chưa thể xác định chính xác góc quay yaw và phân loại của 2 pedestrian và 1 two-wheels ở lượt B nếu chỉ dựa vào ảnh Side 2D mà thiếu ảnh BEV/camera đối chiếu.
 
-### Nhận xét của TV2
+### Nhận xét của Chu Thái Hòa — 02083
 
 - **Vai trò:** Lượt A: Kiểm JSON/cấu hình | Lượt B: Vận hành | Lượt C: Ghi log (theo bảng phân vai `TEAMMATES.md`).
 - **Quan sát có bằng chứng từ các lượt:**
@@ -92,7 +92,7 @@ Khi mọi hộp cùng lệch z, cần kiểm transform/pipeline và tạo lại 
 - **Quyết định lỗi batch và hành động:** Với ca `case-batch-z` trong `output/qc-cases/`, toàn bộ các hộp đều bị lệch cùng một lượng z do lỗi tham số phép chuyển hệ tọa độ trong pipeline. Quyết định: Dừng batch ngay lập tức, báo LC kiểm tra pipeline chuyển đổi; tuyệt đối không sửa thủ công từng hộp trong CVAT.
 - **Điều chưa chắc:** Cần nghiên cứu sâu hơn về cơ chế trích xuất đặc trưng của Pillar Feature Net và mạng 2D Backbone của PointPillars để hiểu rõ hơn tại sao kích thước pillar $0.32\text{ m}$ lại làm điểm tin cậy của anchor xe bị rớt xuống dưới threshold 0.3 trong khi lại gom các điểm thưa kích hoạt anchor người đi bộ.
 
-### Nhận xét của TV4
+### Cầm Vũ Ngọc Thạch — 02067
 
 - Vai trò: Lượt A ghi log; Lượt B xem hình học (ảnh Side); Lượt C kiểm JSON/cấu hình. Trạng thái: `executed-by-group`.
 
@@ -118,20 +118,26 @@ Khi mọi hộp cùng lệch z, cần kiểm transform/pipeline và tạo lại 
 
 **Điều chưa chắc:** Chưa biết vì sao pillar 0.32 giữ pedestrian mà mất vehicles (chỉ quan sát số liệu, chưa có bằng chứng nguyên nhân). Chưa chắc hộp lượt A chìm do delta=0 hay do model; Side chỉ là hình chiếu x-z toàn scene nên chưa đủ để kết luận. Không có reference nên chưa nói được cấu hình nào tốt hơn.
 
-### Nhận xét của TV1
+### Nhận xét của Nguyễn Đăng Tuấn Huy — 02076
 
 - **Vai trò:** Lượt A: Vận hành | Lượt B: Ghi log | Lượt C: Xem hình học
 - **Trạng thái:** `executed-by-group`.
 - **Quan sát A↔B:** Lượt A (delta=0) chỉ detect 1 box vehicles (mean_z=0.330, score=0.322, file `output/run-A/boxes-demo-delta-0-voxel-0.16.json`). Lượt B (delta=1.73) detect 13 box: vehicles=10, pedestrian=2, two-wheels=1 (mean_z=1.034, file `output/run-B/boxes-demo-delta-1.73-voxel-0.16.json`). Kết luận: delta z thay đổi đặc trưng pillar đầu vào, không phải chỉ dịch output — model "nhìn thấy" hình dạng hoàn toàn khác của cùng đám mây điểm.
 - **Quan sát B↔C:** Lượt C (voxel=0.32m) mất hoàn toàn vehicles=10, chỉ còn pedestrian=6 (file `output/run-C/boxes-demo-delta-1.73-voxel-0.32.json`). Ảnh `output/run-C/side-demo-delta-1.73-voxel-0.32.png` cho thấy ít hộp hơn rõ rệt, không còn hộp kích thước xe. Pillar to làm giảm độ phân giải XY; nguyên nhân cụ thể khiến prediction không còn vehicles chưa được xác minh.
-- **Phép z:** `z_model = z_source - z_ground - delta`. Lượt A: delta=0 → `z_model_A = z_source - 0.075 m`. Lượt B: delta=1.73 → `z_model_B = z_source - 0.075 - 1.73 = z_source - 1.805 m`, nên input B thấp hơn tọa độ của cùng điểm trong PCD nguồn 1.805 m. So với lượt A trên cùng điểm nguồn và cùng z_ground, input B thấp hơn 1.73 m. Khi xuất JSON, script dùng `z_source = z_model + delta + z_ground`. JSON đã ở hệ PCD nguồn nên không cộng delta/z_ground lần nữa khi đọc hoặc chuyển tiếp.
+- **Phép z:** `z_model = z_source - z_ground - delta`. Lượt A: delta=0 → z_model ≈ z_source - 0.075m. Lượt B: delta=1.73 → z_model = z_source - 0.075 - 1.73 → model nhận input thấp hơn ~1.805m → đặc trưng voxel pillar thay đổi lớn. Khi xuất JSON, script dùng `z_source = z_model + delta + z_ground`. JSON đã ở hệ PCD nguồn nên không cộng delta/z_ground lần nữa khi đọc hoặc chuyển tiếp.
 - **Quyết định QC:** `case-batch-z` — toàn bộ 13 hộp lệch z cùng một lượng (−1.805m theo `manifest.json`). Đây là ca mô phỏng lỗi hệ thống trong phép chuyển pipeline, không phải lỗi từng hộp. → **Hành động: Dừng batch, không sửa tay, báo LC kiểm pipeline chuyển z.**
 - **Điều chưa chắc:** Chưa rõ tại sao pillar to (0.32m) lại giữ pedestrian mà mất hoàn toàn vehicles — có thể do vehicles cần nhiều pillar liên tiếp để tạo đặc trưng hình dạng dài, trong khi pedestrian compact hơn nên vẫn nằm gọn trong 1 pillar to.
 
 ## LC ghi nhận riêng
 
-- Quyền dùng PCD/image và đúng ca:
-- Có chạy thật / chỉ phân tích; còn cần lượt thực hành bổ sung:
-- Output đủ, giữ bản gốc, không đưa ca lỗi vào CVAT:
-- Nhận xét từng thành viên và quyết định dừng pipeline:
-- Đồng ý chuyển sang chỉnh/QC / cần bổ sung; lý do:
+> LC ghi nhận ngày 01/10/2026. **Kết luận: ĐẠT.**
+
+- **Quyền dùng PCD/image và đúng ca:** Gói Student KITTI 000008 (giấy phép CC BY-NC-SA 3.0), không dùng dữ liệu Robotaxi. Input SHA-256 `3b5ea3da…` và image `sha256:e03983bd…` (amd64) khớp `smoke.json`.
+- **Có chạy thật / chỉ phân tích; còn cần lượt thực hành bổ sung:** Đã nhận `smoke.json`: passed, amd64, chạy 15:07–15:08 (khớp báo cáo); nạp image 22,8 s, A/B/C 6,1 / 5,4 / 3,4 s, kết quả 1/13/6. Thời gian lượt B khớp số một thành viên ghi trong báo cáo (5,41 s).
+- **Output đủ, giữ bản gốc, không đưa ca lỗi vào CVAT:** Chỉ gửi `smoke.json`, không gửi JSON/PNG/CSV. `smoke.json` có hash input, image, code nên đủ để xác nhận lần chạy. Báo cáo nêu rõ không import JSON KITTI và `case-*` vào CVAT.
+- **Nhận xét từng thành viên và quyết định dừng pipeline:** Đủ 4 người, có tên file và số liệu khớp file thật. Phân biệt rõ quan sát với giả thuyết; hiểu đúng input B thấp hơn A 1,73 m.
+- **Đồng ý chuyển sang chỉnh/QC / cần bổ sung; lý do:** **Đồng ý chuyển sang chỉnh/QC.**
+
+**Nên sửa:**
+1. Một nhận xét ghi "input thấp hơn ~1,805 m": ghi rõ là so với nguồn hay so với lượt A (1,73 m).
+2. Chuyển họ tên, MSSV từ báo cáo sang `TEAMMATES.md`.
