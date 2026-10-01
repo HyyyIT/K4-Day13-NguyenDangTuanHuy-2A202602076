@@ -58,4 +58,3 @@ Mỗi thành viên tự viết một mục: vai trò đã làm; một quan sát 
 - Output đủ, giữ bản gốc, không đưa ca lỗi vào CVAT:
 - Nhận xét từng thành viên và quyết định dừng pipeline:
 - Đồng ý chuyển sang chỉnh/QC / cần bổ sung; lý do:
-
