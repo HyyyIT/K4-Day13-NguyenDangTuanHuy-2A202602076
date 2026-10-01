@@ -1,6 +1,6 @@
 # Thành viên nhóm — Day 13
 
-Mã nhóm/phòng: K4-DAY13-Vui_Ve
+Mã nhóm/phòng: K4-DAY13-VuiVe
 
 | Họ và tên | MSSV | Vai trò lượt A | Vai trò lượt B | Vai trò lượt C |
 | --- | --- | --- | --- | --- |
