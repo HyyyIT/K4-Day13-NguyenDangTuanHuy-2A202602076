@@ -31,10 +31,9 @@ Giữ bản đã điền ngoài Git, trong thư mục nhóm private do LC thu. �
 
 | Ca | Số hộp lệch z / tổng hộp | Lượng lệch | Class/x/y/yaw có đổi? | Dừng batch, kiểm từng hộp hay chưa rõ? | Bằng chứng |
 | --- | --- | --- | --- | --- | --- |
-| case-correct | | | | | |
+| case-correct | 0/13 | Không có hộp lệch z | Class/x/y/yaw giữ nguyên theo prediction B | Không cần hành động thêm — prediction trông hợp lý | side-correct.png: hộp nằm đúng chiều cao, phân bố hợp lý |
 | case-batch-z | 13/13 | Tất cả hộp bị trừ z xuống ~1.805m (= delta + z_ground = 1.73 + 0.075) | Class/x/y/yaw không đổi | **Dừng batch, kiểm phép chuyển pipeline** — lỗi hệ thống, không phải lỗi từng hộp | side-batch-z.png: toàn bộ hộp nổi lên cao bất thường so với side-correct.png |
 | case-one-box-z | 1/13 | Chỉ hộp đầu tiên (vehicles x=8.09) bị trừ z xuống ~1.805m | Class/x/y/yaw của 12 hộp còn lại không đổi | **Kiểm đối tượng đó từ nhiều góc** (Front, Top, Side) trước khi quyết định; không dừng cả batch | side-one-box-z.png: 12 hộp bình thường, 1 hộp xe nằm quá thấp so với mặt đất |
-| case-correct | 0/13 | Không có hộp lệch z | Class/x/y/yaw giữ nguyên theo prediction B | Không cần hành động thêm — prediction trông hợp lý | side-correct.png: hộp nằm đúng chiều cao, phân bố hợp lý |
 
 Ghi rõ helper tạo biến đổi có chủ đích từ prediction, không phải kết quả inference riêng hoặc nhãn đúng. Nguồn: `manifest.json` — `case-batch-z` dịch toàn bộ z xuống delta+z_ground=1.805m; `case-one-box-z` chỉ dịch hộp index 0.
 
