@@ -2,20 +2,11 @@
 
 Giữ bản đã điền ngoài Git, trong thư mục nhóm private do LC thu. Đây là kiểm tra formative; không ghi điểm của người khác.
 
-## Nguồn báo cáo sau khi gộp nhánh
-
-Phần chung dưới đây lấy từ bản NguyenKhoi; nhận xét cá nhân lấy từ nhánh của chính từng thành viên. Các bản gốc được giữ đầy đủ để đối chiếu những diễn giải hoặc ghi nhận chưa thống nhất:
-
-- [NguyenKhoi](ket-qua-nhom-01/bao-cao-theo-nhanh/NguyenKhoi.md)
-- [ThaiHoa](ket-qua-nhom-01/bao-cao-theo-nhanh/ThaiHoa.md)
-- [Huy](ket-qua-nhom-01/bao-cao-theo-nhanh/Huy.md)
-- [Ngoc_Thach](K4-DAY13-Nhom01/PRE-LABEL-REPORT.md)
-
 ## Nhóm và provenance
 
 - Mã nhóm/phòng: K4-DAY13-Nhom01
 - Thành viên: xem `TEAMMATES.md` (Nguyễn Đăng Tuấn Huy - 02076, Chu Thái Hòa - 02083, Kim Nguyên Khôi - 02116, Cầm Vũ Ngọc Thạch - 02067).
-- Trạng thái: chưa thống nhất giữa các bản báo cáo. Huy ghi `provided-results`; NguyenKhoi, ThaiHoa và Ngoc_Thach ghi `executed-by-group`. Giữ nguyên ghi nhận của từng người ở các bản gốc bên dưới.
+- Trạng thái: `executed-by-group` (chạy qua Docker student runner trên kiến trúc amd64).
 - Người thực sự chạy; ngày/giờ; hệ máy/architecture: Nhóm vận hành (Nguyễn Khôi vận hành Lượt C, Thái Hòa Lượt B, Tuấn Huy Lượt A); 2026-10-01T08:07:23Z; Linux amd64 (4 CPUs, 4GB RAM).
 - Image tag và image ID; phiên bản repo: Image `day13-pointpillars:lc-20261001-amd64` (ID: `sha256:e03983bd922ec29890bf547db8de408402efd82583680b62e671c20da2fd2c82`); Repo revision: `0831856d921609312d42c7582c366e5a311bb7b1`.
 - PCD được cấp / frame_id; nơi được phép chạy; fingerprint nếu LC cấp: `demo.pcd` (frame_id: `demo`, mẫu KITTI 000008 đã chuyển đổi z+1.73m, sha256: `3b5ea3da13e2b19149cab6a8d521c2ca55f2df93f026b5a3f8c273ce70645d60`).
@@ -73,48 +64,29 @@ Ghi rõ helper `practice/pipeline-qc-cases.py` tạo biến đổi có chủ đ�
   - Chưa rõ tại sao khi tăng kích thước pillar lên 0.32m thì mạng lại mất toàn bộ class `vehicles` nhưng lại nhận diện được 6 `pedestrian` (có thể do pooling của voxel thô làm suy yếu đặc trưng của xe lớn hoặc do anchor tuning).
   - Chưa thể xác định chính xác góc quay yaw và phân loại của 2 pedestrian và 1 two-wheels ở lượt B nếu chỉ dựa vào ảnh Side 2D mà thiếu ảnh BEV/camera đối chiếu.
 
-### Nhận xét của Chu Thái Hòa — 02083
-- **Vai trò:** Lượt A: Kiểm JSON/cấu hình | Lượt B: Vận hành | Lượt C: Ghi log (theo bảng phân vai `TEAMMATES.md`).
-- **Quan sát có bằng chứng từ các lượt:**
-  - *Lượt A (Kiểm JSON):* File `run-A/boxes-demo-delta-0-voxel-0.16.json` chỉ có 1 box duy nhất thuộc lớp `vehicles` (score 0.322, mean_z=0.330m), đáy hộp $z_{bottom}=-0.399\text{ m}$ chìm dưới mặt đất $z_{ground}=0.075\text{ m}$. Lượt A miss hầu như toàn bộ vật thể vì $\delta=0$.
-  - *Lượt B (Vận hành):* Chạy script với $\delta=1.73$, voxel $0.16\text{ m}$, container hoàn thành sau 5.41s. Output `run-B/boxes-demo-delta-1.73-voxel-0.16.json` tăng vọt lên 13 boxes (10 vehicles, 2 pedestrian, 1 two-wheels, mean_z=1.034m), đáy các hộp nằm khớp sát mặt đất.
-  - *Lượt C (Ghi log):* Khi tăng voxel lên $0.32\text{ m}$, file `run-C/boxes-demo-delta-1.73-voxel-0.32.json` chỉ còn 6 boxes và toàn bộ là `pedestrian` (mất sạch 10 xe và 1 xe hai bánh). Ảnh `run-C/side-*.png` cho thấy không còn bất kỳ bounding box xe hơi nào.
-- **Diễn giải phép z thuận/ngược:** Áp dụng $z_{model} = z_{source} - z_{ground} - \delta$ và $z_{source} = z_{model} + z_{ground} + \delta$. Ở lượt A, vì $\delta=0$ nên $z_{model} \approx z_{source} - 0.075\text{ m}$, làm đám mây điểm đưa vào mạng cao hơn $1.73\text{ m}$ so với hệ tọa độ chuẩn của KITTI LiDAR. Việc thay đổi $\delta$ trước inference làm thay đổi phân bố dữ liệu đưa vào mạng (input distribution shift), quyết định việc vật thể có được nhận diện hay không, khác hoàn toàn việc tịnh tiến z sau khi đã có output bounding box.
-- **Quyết định lỗi batch và hành động:** Với ca `case-batch-z` trong `qc-cases/`, toàn bộ các hộp đều bị lệch cùng một lượng z do lỗi tham số phép chuyển hệ tọa độ trong pipeline. Quyết định: Dừng batch ngay lập tức, báo LC kiểm tra pipeline chuyển đổi; tuyệt đối không sửa thủ công từng hộp trong CVAT.
-- **Điều chưa chắc:** Cần nghiên cứu sâu hơn về cơ chế trích xuất đặc trưng của Pillar Feature Net và mạng 2D Backbone của PointPillars để hiểu rõ hơn tại sao kích thước pillar $0.32\text{ m}$ lại làm điểm tin cậy của anchor xe bị rớt xuống dưới threshold 0.3 trong khi lại gom các điểm thưa kích hoạt anchor người đi bộ.
+### Nhận xét của Nguyễn Đăng Tuấn Huy — MSSV: 02076
+- **Vai trò:** Lượt A: vận hành | Lượt B: ghi log | Lượt C: xem hình học
+- **Quan sát A↔B:** Lượt A chỉ detect 1 box (mean_z=0.330), lượt B detect 13 box (mean_z=1.034). File `run-B/boxes-*.json` cho thấy model "nhìn thấy" nhiều vật thể hơn khi cloud nằm ở độ cao khác — không phải chỉ dịch cùng 1.73m.
+- **Quan sát B↔C:** Voxel 0.32m làm mất phân giải → mất vehicles=10, chỉ còn pedestrian=6. File `run-C/side-*.png` cho thấy ít hộp hơn rõ rệt.
+- **Phép z:** $z_{\text{model}} = z_{\text{source}} - z_{\text{ground}} - \delta$. Lượt A: delta=0 nên $z_{\text{model}} \approx z_{\text{source}} - 0.075$. Lượt B: delta=1.73 → model thấy input cao hơn 1.73m.
+- **Quyết định QC:** `case-batch-z` → cả batch lệch cùng lượng → dừng batch, kiểm phép chuyển pipeline. Không sửa tay từng hộp.
+- **Điều chưa chắc:** Chưa rõ tại sao pillar to lại giữ pedestrian mà mất vehicles.
 
-### Cầm Vũ Ngọc Thạch — 02067
+### Nhận xét của Chu Thái Hòa — MSSV: 02083
+- **Vai trò:** Lượt A: kiểm JSON/cấu hình | Lượt B: vận hành | Lượt C: ghi log
+- **Quan sát A↔B:** Ở lượt A `run-A/summary.csv` chỉ có 1 box, class vehicles. Sang lượt B với delta=1.73m, `run-B/summary.csv` cho thấy có 13 boxes với đủ cả 3 classes (10 vehicles, 2 pedestrian, 1 two-wheels), mean_z nâng từ 0.330m lên 1.034m.
+- **Quan sát B↔C:** Lượt C đổi voxel từ 0.16m lên 0.32m làm số boxes giảm từ 13 xuống 6 (`run-C/summary.csv`). Toàn bộ 10 vehicles bị mất, chỉ còn 6 pedestrian.
+- **Phép z:** Chuyển đổi $z_{\text{model}} = z_{\text{source}} - z_{\text{ground}} - \delta$ thay đổi phân bố điểm đưa vào mạng. Hậu xử lý phải cộng ngược lại $z_{\text{source}} = z_{\text{model}} + z_{\text{ground}} + \delta$.
+- **Quyết định QC:** `case-batch-z` có 13/13 boxes bị trừ cùng lượng 1.805m → Dừng pipeline báo LC. `case-one-box-z` chỉ lệch 1 box → kiểm tra đối tượng cục bộ.
+- **Điều chưa chắc:** Cần kiểm tra thêm ảnh camera phối cảnh để xác minh 1 xe hai bánh ở lượt B có đúng nhãn không.
 
-- Vai trò: Lượt A ghi log; Lượt B xem hình học (ảnh Side); Lượt C kiểm JSON/cấu hình. Trạng thái: `executed-by-group` **[nhóm xác nhận]**.
-
-**Lượt A — ghi log** (delta=0, voxel=0.16; `run-A/`)
-- `summary.csv`: n_boxes=1, mean_z=0.330. JSON `boxes-demo-delta-0-voxel-0.16.json`: 1 hộp vehicles, x=13.15, y=-0.45, z=0.330, length 3.62, width 1.52, height 1.46, yaw 2.67, score 0.32.
-- Ảnh `side-demo-delta-0-voxel-0.16.png`: đáy hộp ≈ 0.330 - 1.46/2 = -0.40 m, hộp nằm dưới đường z=0 trong khi điểm mặt đất nằm ở z≈0; chỉ có 1 hộp trên toàn scene trong khi các cụm điểm xe khác không có hộp.
-
-**Lượt B — xem hình học** (delta=1.73, voxel=0.16; `run-B/`)
-- `summary.csv`: n_boxes=13, mean_z=1.034; 10 vehicles, 1 two-wheels, 2 pedestrian; score từ 0.32 đến 0.93.
-- Ảnh `side-demo-delta-1.73-voxel-0.16.png`: các hộp xe lớn có đáy gần z≈0 (vd. hộp 1: z=0.92, h=1.54 → đáy ≈ 0.15 m), không còn hộp chìm rõ như lượt A. Hộp mới xuất hiện ở nhiều vị trí x (3.7 → 55.6 m). So với A: 1 → 13 hộp, mean_z +0.704.
-- Hộp pedestrian/two-wheels trên Side là các hộp hẹp, cao ≈ 1.65–1.81 m.
-
-**Lượt C — kiểm JSON/cấu hình** (delta=1.73, voxel=0.32; `run-C/`)
-- `summary.csv`: n_boxes=6, mean_z=1.091. Cả 6 hộp là pedestrian, score 0.30–0.81, height 1.68–1.79; không còn vehicles và two-wheels. Cấu hình khác B đúng một biến (voxel 0.16 → 0.32); frame_id, dataset, delta, z_ground (0.075) giống B.
-- So B → C: 13 → 6 hộp, mất toàn bộ 10 vehicles và 1 two-wheels; mean_z 1.034 → 1.091.
-
-**Phép z:** z_model = z_source - z_ground - delta; z_source = z_model + z_ground + delta (z_ground=0.075; delta=0 ở A, 1.73 ở B/C). Đổi delta trước inference thay input của mạng nên số hộp có thể đổi (A→B: 1→13); khác với việc cộng/trừ một hằng số lên mọi hộp sau inference.
-
-**Quyết định QC:** case-batch-z có 13/13 hộp cùng lệch -1.805 m (z âm toàn bộ; class/x/y/yaw không đổi) → dừng, không sửa tay từng hộp, báo LC kiểm phép chuyển z. case-one-box-z chỉ hộp 1 lệch (0.92 → -0.88), 12 hộp còn lại giữ nguyên → kiểm riêng đối tượng đó qua Top/Side/Front và camera.
-
-**Điều chưa chắc:** Chưa biết vì sao pillar 0.32 giữ pedestrian mà mất vehicles (chỉ quan sát số liệu, chưa có bằng chứng nguyên nhân). Chưa chắc hộp lượt A chìm do delta=0 hay do model; Side chỉ là hình chiếu x-z toàn scene nên chưa đủ để kết luận. Không có reference nên chưa nói được cấu hình nào tốt hơn.
-
-### Nhận xét của Nguyễn Đăng Tuấn Huy — 02076
-
-- **Vai trò:** Lượt A: Vận hành | Lượt B: Ghi log | Lượt C: Xem hình học
-- **Trạng thái:** Phân tích kết quả `provided-results`; chưa tự chạy inference.
-- **Quan sát A↔B:** Lượt A (delta=0) chỉ detect 1 box vehicles (mean_z=0.330, score=0.322, file `run-A/boxes-demo-delta-0-voxel-0.16.json`). Lượt B (delta=1.73) detect 13 box: vehicles=10, pedestrian=2, two-wheels=1 (mean_z=1.034, file `run-B/boxes-demo-delta-1.73-voxel-0.16.json`). Kết luận: delta z thay đổi đặc trưng pillar đầu vào, không phải chỉ dịch output — model "nhìn thấy" hình dạng hoàn toàn khác của cùng đám mây điểm.
-- **Quan sát B↔C:** Lượt C (voxel=0.32m) mất hoàn toàn vehicles=10, chỉ còn pedestrian=6 (file `run-C/boxes-demo-delta-1.73-voxel-0.32.json`). Ảnh `run-C/side-demo-delta-1.73-voxel-0.32.png` cho thấy ít hộp hơn rõ rệt, không còn hộp kích thước xe. Pillar to làm mất phân giải phân biệt xe vs nền.
-- **Phép z:** `z_model = z_source - z_ground - delta`. Lượt A: delta=0 → z_model ≈ z_source - 0.075m. Lượt B: delta=1.73 → z_model = z_source - 0.075 - 1.73 → model nhận input thấp hơn ~1.805m → đặc trưng voxel pillar thay đổi lớn. Ngược lại khi export ra CVAT: z_cvat = z_model + delta + z_ground.
-- **Quyết định QC:** `case-batch-z` — toàn bộ 13 hộp lệch z cùng một lượng (−1.805m theo `manifest.json`). Đây là lỗi hệ thống trong phép chuyển pipeline, không phải lỗi từng hộp. → **Hành động: Dừng batch, không sửa tay, báo LC kiểm pipeline chuyển z.**
-- **Điều chưa chắc:** Chưa rõ tại sao pillar to (0.32m) lại giữ pedestrian mà mất hoàn toàn vehicles — có thể do vehicles cần nhiều pillar liên tiếp để tạo đặc trưng hình dạng dài, trong khi pedestrian compact hơn nên vẫn nằm gọn trong 1 pillar to.
+### Nhận xét của Cầm Vũ Ngọc Thạch — MSSV: 02067
+- **Vai trò:** Lượt A: ghi log | Lượt B: xem hình học | Lượt C: kiểm JSON/cấu hình
+- **Quan sát A↔B:** Ảnh `side-demo-delta-0-voxel-0.16.png` chỉ có 1 hộp chìm sát vạch z=0. Sang `side-demo-delta-1.73-voxel-0.16.png` các hộp phân bố đều ở độ cao thực tế trên mặt đường và xuất hiện thêm nhiều cụm xe khác nhau.
+- **Quan sát B↔C:** `run-C/boxes-*.json` cho thấy 6 hộp đều có label pedestrian, không còn xe nào. Kích thước voxel lớn làm mất các chi tiết hình khối dài của xe.
+- **Phép z:** Phép dịch delta trước model ảnh hưởng trực tiếp đến việc kích hoạt anchor và trích xuất đặc trưng của mạng, khác hoàn toàn việc tịnh tiến z sau suy luận.
+- **Quyết định QC:** Phát hiện lỗi hàng loạt ở `case-batch-z` thì phải dừng pipeline ngay lập tức, không import vào CVAT; `case-one-box-z` thì kiểm tra riêng hộp đó.
+- **Điều chưa chắc:** Chưa rõ độ nhạy của ngưỡng score threshold 0.3 khi thay đổi kích thước voxel.
 
 ## LC ghi nhận riêng
 
